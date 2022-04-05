@@ -217,6 +217,24 @@ mysql> SELECT party_Id, first_Name, last_Name, COUNT(*) FROM person, order_item_
 
 ---------------------------------------------------------------------------------
 19. List the unique order Ids for the Order Headers with more than one orderItem ShipGroup.
+mysql> SELECT oh.order_id FROM order_header oh INNER JOIN 
+    -> Order_Item_Ship_Group oi ON oh.order_Id = oi.order_id WHERE oi.order_Id > 1;
++----------+
+| order_id |
++----------+
+| 1051     |
+| 1061     |
+| 1064     |
+| 1102     |
+| 1255     |
+| 1051     |
+| 1052     |
+| 1061     |
+| 1064     |
+| 1102     |
+| 1153     |
+| 1255     |
++----------+
 
 ---------------------------------------------------------------------------------
 20. List all OrderHeader details whose grandTotal is greater than the average grandTotal for all orders date 2020-04-17.
@@ -650,3 +668,15 @@ quantity
 unitAmount
 
 25. List facilityId and total where total = sum of (orderItem.quantity X orderItem.unitAmount).
+mysql> SELECT facility_Id, SUM(quantity * unit_Amount) FROM order_item oi Inner JOIN
+    -> Order_Item_Ship_Group osg ON osg.order_id = oi.order_id 
+    -> GROUP BY FACILITY_ID;
++--------------------+-----------------------------+
+| facility_Id        | SUM(quantity * unit_Amount) |
++--------------------+-----------------------------+
+| RegionalWarehouse1 |             213.89000000000 |
+| RegionalWarehouse2 |             205.85000000000 |
+| WebStoreWarehouse  |             467.70000000000 |
++--------------------+-----------------------------+
+3 rows in set (0.00 sec)
+
