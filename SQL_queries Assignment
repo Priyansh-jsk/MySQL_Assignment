@@ -1,0 +1,682 @@
+1. List all columns of OrderItem table.
+mysql> SHOW COLUMNS
+    -> FROM order_item;
++-------------------+---------------+------+-----+---------+-------+
+| Field             | Type          | Null | Key | Default | Extra |
++-------------------+---------------+------+-----+---------+-------+
+| ORDER_ID          | varchar(40)   | NO   | PRI | NULL    |       |
+| ORDER_ITEM_SEQ_ID | varchar(40)   | NO   | PRI | NULL    |       |
+| SHIP_GROUP_SEQ_ID | varchar(40)   | YES  |     | NULL    |       |
+| PRODUCT_ID        | varchar(40)   | YES  | MUL | NULL    |       |
+| ITEM_DESCRIPTION  | varchar(255)  | YES  |     | NULL    |       |
+| QUANTITY          | decimal(26,6) | YES  |     | NULL    |       |
+| UNIT_AMOUNT       | decimal(25,5) | YES  |     | NULL    |       |
+| orderItemTypeId   | varchar(30)   | YES  |     | NULL    |       |
++-------------------+---------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+--------------------------------------------------------------------------------
+2. List the Person details for all females.
+mysql> SELECT * FROM person
+    -> WHERE GENDER='F';
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+| PARTY_ID  | FIRST_NAME | MIDDLE_NAME | LAST_NAME | GENDER | BIRTH_DATE | EMPLOYMENT_STATUS_ENUM_ID | OCCUPATION        |
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+| CustDemo3 | Lily       | J           | Brown     | F      | 1998-06-11 | EMPS_PARTTIME             | Software Engineer |
+| CustDemo4 | John       | J           | Norvig    | F      | 1998-06-11 | EMPS_FULLTIME             | Software Engineer |
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+2 rows in set (0.00 sec)
+--------------------------------------------------------------------------------
+3. List the OrderHeader table contents so that the latest placed order appears in the top.
+mysql> SELECT * FROM order_header
+    -> ORDER BY ORDER_DATE;
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| ORDER_ID | ORDER_TYPE_ID | ORDER_NAME   | ORDER_DATE              | STATUS_ID       | CURRENCY_UOM_ID | PRODUCT_STORE_ID  | SALES_CHANNEL_ENUM_ID | GRAND_TOTAL |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| 1061     | SALES_ORDER   | Test Order 6 | 2019-04-24 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     87.0700 |
+| 1255     | SALES_ORDER   | Test Order 5 | 2020-03-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     75.9300 |
+| 1051     | SALES_ORDER   | Test Order 1 | 2020-04-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     77.9500 |
+| 1052     | SALES_ORDER   | Test Order 2 | 2020-04-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     16.3200 |
+| 1102     | SALES_ORDER   | Test Order 3 | 2020-04-17 00:00:00.000 | ORDER_COMPLETED | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |    129.9200 |
+| 1153     | SALES_ORDER   | Test Order 4 | 2020-04-19 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     31.6400 |
+| 1064     | SALES_ORDER   | Test Order 7 | 2022-01-09 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     48.8700 |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+7 rows in set (0.00 sec)
+---------------------------------------------------------------------------------
+4. Output the count of OrderItem Ship Group for each shipmentMethodTypeId.
+mysql> SELECT shipment_Method_Type_Id, COUNT(*)
+    -> FROM order_item_ship_group GROUP BY shipment_Method_Type_Id;
++-------------------------+----------+
+| shipment_Method_Type_Id | COUNT(*) |
++-------------------------+----------+
+| GROUND                  |       12 |
++-------------------------+----------+
+1 row in set (0.00 sec)
+--------------------------------------------------------------------------------
+5. List the OrderHeader details with grandTotal greater than 50.
+mysql> SELECT * FROM order_header
+    -> WHERE GRAND_TOTAL>50;
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| ORDER_ID | ORDER_TYPE_ID | ORDER_NAME   | ORDER_DATE              | STATUS_ID       | CURRENCY_UOM_ID | PRODUCT_STORE_ID  | SALES_CHANNEL_ENUM_ID | GRAND_TOTAL |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| 1051     | SALES_ORDER   | Test Order 1 | 2020-04-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     77.9500 |
+| 1061     | SALES_ORDER   | Test Order 6 | 2019-04-24 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     87.0700 |
+| 1102     | SALES_ORDER   | Test Order 3 | 2020-04-17 00:00:00.000 | ORDER_COMPLETED | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |    129.9200 |
+| 1255     | SALES_ORDER   | Test Order 5 | 2020-03-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     75.9300 |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+4 rows in set (0.00 sec)
+-------------------------------------------------------------------------------
+6. List the Person details who have not placed any orders.
+mysql> SELECT first_Name, last_Name from person WHERE party_Id NOT IN (SELECT customer_Party_Id FROM Order_Item_Ship_Group);
++------------+-----------+
+| first_Name | last_Name |
++------------+-----------+
+| Jack       | Smith     |
++------------+-----------+
+-------------------------------------------------------------------------------
+7. List the Person details whose first name starts with ‘J’ and third character is ’h’.
+mysql> SELECT * FROM person
+   -> WHERE first_name LIKE 'J%' AND first_name LIKE '__h%';
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+| PARTY_ID  | FIRST_NAME | MIDDLE_NAME | LAST_NAME | GENDER | BIRTH_DATE | EMPLOYMENT_STATUS_ENUM_ID | OCCUPATION        |
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+| CustDemo4 | John       | J           | Norvig    | F      | 1998-06-11 | EMPS_FULLTIME             | Software Engineer |
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+1 row in set (0.00 sec)
+--------------------------------------------------------------------------------
+8. List all OrderItem details for the order with orderId, 1102 and shipGroupSeqId, 01.
+mysql> SELECT * FROM order_item
+    -> WHERE ORDER_ID = 1102 AND SHIP_GROUP_SEQ_ID=01;
++----------+-------------------+-------------------+-------------+-----------------------+----------+-------------+--------------------+
+| ORDER_ID | ORDER_ITEM_SEQ_ID | SHIP_GROUP_SEQ_ID | PRODUCT_ID  | ITEM_DESCRIPTION      | QUANTITY | UNIT_AMOUNT | orderItemTypeId    |
++----------+-------------------+-------------------+-------------+-----------------------+----------+-------------+--------------------+
+| 1102     | 01                | 01                | DEMO_UNIT_1 | Demo Product Unit One | 3.000000 |    16.99000 | PRODUCT_ORDER_ITEM |
+| 1102     | 02                | 01                | DEMO_UNIT_2 | Demo Product Unit Two | 3.000000 |    18.99000 | PRODUCT_ORDER_ITEM |
+| 1102     | 03                | 01                | NULL        | Rental Item           | 3.000000 |     2.33000 | RENTAL_ORDER_ITEM  |
++----------+-------------------+-------------------+-------------+-----------------------+----------+-------------+--------------------+
+3 rows in set (0.00 sec) 
+--------------------------------------------------------------------------------
+9. List the OrderItem details for only those products for which chargeShipping is set to "Y".
+mysql> SELECT * FROM product as p, order_item as o WHERE p.product_Id = o.product_Id AND CHARGE_SHIPPING = 'Y';
++-------------+-----------------------+-------------------------+---------------------------------+-----------------+------------+----------+-------------------+-------------------+-------------+-------------------------+----------+-------------+--------------------+
+| PRODUCT_ID  | MANUFACTURER_PARTY_ID | PRODUCT_NAME            | DESCRIPTION                     | CHARGE_SHIPPING | RETURNABLE | ORDER_ID | ORDER_ITEM_SEQ_ID | SHIP_GROUP_SEQ_ID | PRODUCT_ID  | ITEM_DESCRIPTION        | QUANTITY | UNIT_AMOUNT | orderItemTypeId    |
++-------------+-----------------------+-------------------------+---------------------------------+-----------------+------------+----------+-------------------+-------------------+-------------+-------------------------+----------+-------------+--------------------+
+| DEMO_UNIT_1 | ORG_ZIZI_RETAIL       | Demo Product Unit One   | This is Demo Product Unit One   | Y               | Y          | 1051     | 01                | 01                | DEMO_UNIT_1 | Demo Product Unit One   | 1.000000 |    16.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_1 | ORG_ZIZI_RETAIL       | Demo Product Unit One   | This is Demo Product Unit One   | Y               | Y          | 1102     | 01                | 01                | DEMO_UNIT_1 | Demo Product Unit One   | 3.000000 |    16.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_2 | ORG_ZIZI_RETAIL       | Demo Product Unit Two   | This is Demo Product Unit Two   | Y               | Y          | 1051     | 02                | 02                | DEMO_UNIT_2 | Demo Product Unit Two   | 3.000000 |    18.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_2 | ORG_ZIZI_RETAIL       | Demo Product Unit Two   | This is Demo Product Unit Two   | Y               | Y          | 1061     | 01                | 01                | DEMO_UNIT_2 | Demo Product Unit Two   | 2.000000 |    15.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_2 | ORG_ZIZI_RETAIL       | Demo Product Unit Two   | This is Demo Product Unit Two   | Y               | Y          | 1064     | 02                | 02                | DEMO_UNIT_2 | Demo Product Unit Two   | 2.000000 |     6.33000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_2 | ORG_ZIZI_RETAIL       | Demo Product Unit Two   | This is Demo Product Unit Two   | Y               | Y          | 1102     | 02                | 01                | DEMO_UNIT_2 | Demo Product Unit Two   | 3.000000 |    18.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_3 | ORG_ZIZI_RETAIL       | Demo Product Unit Three | This is Demo Product Unit Three | Y               | N          | 1052     | 01                | 01                | DEMO_UNIT_3 | Demo Product Unit Three | 1.000000 |    14.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_3 | ORG_ZIZI_RETAIL       | Demo Product Unit Three | This is Demo Product Unit Three | Y               | N          | 1102     | 04                | 02                | DEMO_UNIT_3 | Demo Product Unit Three | 1.000000 |    14.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_3 | ORG_ZIZI_RETAIL       | Demo Product Unit Three | This is Demo Product Unit Three | Y               | N          | 1153     | 01                | 01                | DEMO_UNIT_3 | Demo Product Unit Three | 1.000000 |    14.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_4 | ORG_ZIZI_RETAIL       | Demo Product Unit Four  | This is Demo Product Unit Four  | Y               | Y          | 1153     | 03                | 01                | DEMO_UNIT_4 | Product Unit FourDemo   | 1.000000 |    12.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_4 | ORG_ZIZI_RETAIL       | Demo Product Unit Four  | This is Demo Product Unit Four  | Y               | Y          | 1255     | 01                | 01                | DEMO_UNIT_4 | Demo Product Unit Four  | 3.000000 |    12.99000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_5 | ORG_ZIZI_RETAIL       | Demo Product Unit Five  | This is Demo Product Unit Five  | Y               | N          | 1061     | 02                | 02                | DEMO_UNIT_5 | Demo Product Unit Five  | 1.000000 |    55.09000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_5 | ORG_ZIZI_RETAIL       | Demo Product Unit Five  | This is Demo Product Unit Five  | Y               | N          | 1064     | 01                | 01                | DEMO_UNIT_5 | Demo Product Unit Five  | 3.000000 |    12.07000 | PRODUCT_ORDER_ITEM |
+| DEMO_UNIT_5 | ORG_ZIZI_RETAIL       | Demo Product Unit Five  | This is Demo Product Unit Five  | Y               | N          | 1255     | 03                | 02                | DEMO_UNIT_5 | Demo Product Unit Five  | 3.000000 |    10.99000 | PRODUCT_ORDER_ITEM |
++-------------+-----------------------+-------------------------+---------------------------------+-----------------+------------+----------+-------------------+-------------------+-------------+-------------------------+----------+-------------+--------------------+
+14 rows in set (0.00 sec)
+--------------------------------------------------------------------------------
+10. List the Person details whose employment status is either EMPS_SELF or EMPS_FULLTIME without using the OR operator.
+mysql> SELECT * FROM person 
+    -> WHERE employment_status_enum_id IN 
+    -> ('EMPS_FULLTIME'='EMPS_SELF');
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+| PARTY_ID  | FIRST_NAME | MIDDLE_NAME | LAST_NAME | GENDER | BIRTH_DATE | EMPLOYMENT_STATUS_ENUM_ID | OCCUPATION        |
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+| CustDemo1 | Joe        | Q           | Public    | M      | 1999-06-15 | EMPS_FULLTIME             | Software Engineer |
+| CustDemo2 | Jack       | John        | Smith     | M      | 1999-09-14 | EMPS_FULLTIME             | Doctor            |
+| CustDemo3 | Lily       | J           | Brown     | F      | 1998-06-11 | EMPS_PARTTIME             | Software Engineer |
+| CustDemo4 | John       | J           | Norvig    | F      | 1998-06-11 | EMPS_FULLTIME             | Software Engineer |
+| CustDemo5 | Charlie    | Jack        | William   | M      | 1992-04-22 | EMPS_SELF                 | Architect         |
+| CustDemo6 | James      | W           | Evans     | M      | 1993-05-20 | EMPS_FULLTIME             | Civil Engineer    |
++-----------+------------+-------------+-----------+--------+------------+---------------------------+-------------------+
+6 rows in set, 6 warnings (0.00 sec)
+--------------------------------------------------------------------------------
+11. List all columns of Facility table.
+mysql> SHOW COLUMNS 
+    -> FROM facility;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| FACILITY_ID   | varchar(40) | NO   | PRI | NULL    |       |
+| FACILITY_NAME | varchar(40) | NO   |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+--------------------------------------------------------------------------------
+12. Output the sum of the grandTotal from OrderHeader table for each order date.
+mysql> SELECT order_date, SUM(grand_total) FROM order_header 
+    -> GROUP BY order_date;
++-------------------------+------------------+
+| order_date              | SUM(grand_total) |
++-------------------------+------------------+
+| 2019-04-24 00:00:00.000 |          87.0700 |
+| 2020-03-17 00:00:00.000 |          75.9300 |
+| 2020-04-17 00:00:00.000 |         224.1900 |
+| 2020-04-19 00:00:00.000 |          31.6400 |
+| 2022-01-09 00:00:00.000 |          48.8700 |
++-------------------------+------------------+
+5 rows in set (0.00 sec)
+-------------------------------------------------------------------------------
+13. List the OrderHeader records where grand total is greater than highest grand total of the order date on 2020-04-17.
+mysql> SELECT * FROM order_header
+    -> WHERE GRAND_TOTAL > (SELECT SUM(GRAND_TOTAL) 
+    -> FROM order_header WHERE order_date = '2020-04-17');
+Empty set (0.01 sec)
+-------------------------------------------------------------------------------
+14. Output the sum of the grandTotal from OrderHeader table for each order date where total sum is greater than 60.
+mysql> SELECT order_date, SUM(grand_total) 
+    -> FROM order_header GROUP BY grand_total, order_date 
+    -> HAVING grand_total > 60;
++-------------------------+------------------+
+| order_date              | SUM(grand_total) |
++-------------------------+------------------+
+| 2020-03-17 00:00:00.000 |          75.9300 |
+| 2020-04-17 00:00:00.000 |          77.9500 |
+| 2019-04-24 00:00:00.000 |          87.0700 |
+| 2020-04-17 00:00:00.000 |         129.9200 |
++-------------------------+------------------+
+4 rows in set (0.00 sec)
+--------------------------------------------------------------------------------
+15. Output the Person's party Id, first name, last name and orderId for all customers who have order date 2020-04-17.
+
+--------------------------------------------------------------------------------
+16. List the OrderHeader details for highest grandTotal for each order date.
+mysql> SELECT * FROM order_header WHERE grand_total
+    -> IN(SELECT MAX(grand_total) FROM order_header GROUP BY order_date);
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| ORDER_ID | ORDER_TYPE_ID | ORDER_NAME   | ORDER_DATE              | STATUS_ID       | CURRENCY_UOM_ID | PRODUCT_STORE_ID  | SALES_CHANNEL_ENUM_ID | GRAND_TOTAL |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| 1061     | SALES_ORDER   | Test Order 6 | 2019-04-24 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     87.0700 |
+| 1064     | SALES_ORDER   | Test Order 7 | 2022-01-09 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     48.8700 |
+| 1102     | SALES_ORDER   | Test Order 3 | 2020-04-17 00:00:00.000 | ORDER_COMPLETED | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |    129.9200 |
+| 1153     | SALES_ORDER   | Test Order 4 | 2020-04-19 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     31.6400 |
+| 1255     | SALES_ORDER   | Test Order 5 | 2020-03-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     75.9300 |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+5 rows in set (0.01 sec)
+---------------------------------------------------------------------------------
+17. Find the count of order item ship group for each Person. Output the below details for this query:
+partyId
+firstName
+lastName
+count
+mysql> SELECT party_Id, first_Name, last_Name, COUNT(*) FROM person, order_item_ship_group
+    -> WHERE party_id = CUSTOMER_PARTY_ID GROUP BY CUSTOMER_PARTY_ID;
++-----------+------------+-----------+----------+
+| party_Id  | first_Name | last_Name | COUNT(*) |
++-----------+------------+-----------+----------+
+| CustDemo1 | Joe        | Public    |        3 |
+| CustDemo3 | Lily       | Brown     |        2 |
+| CustDemo4 | John       | Norvig    |        1 |
+| CustDemo5 | Charlie    | William   |        2 |
+| CustDemo6 | James      | Evans     |        4 |
++-----------+------------+-----------+----------+
+5 rows in set (0.01 sec)
+---------------------------------------------------------------------------------
+18. Output the customerPartyId and highest order grandTotal for each customer.
+
+---------------------------------------------------------------------------------
+19. List the unique order Ids for the Order Headers with more than one orderItem ShipGroup.
+mysql> SELECT oh.order_id FROM order_header oh INNER JOIN 
+    -> Order_Item_Ship_Group oi ON oh.order_Id = oi.order_id WHERE oi.order_Id > 1;
++----------+
+| order_id |
++----------+
+| 1051     |
+| 1061     |
+| 1064     |
+| 1102     |
+| 1255     |
+| 1051     |
+| 1052     |
+| 1061     |
+| 1064     |
+| 1102     |
+| 1153     |
+| 1255     |
++----------+
+
+---------------------------------------------------------------------------------
+20. List all OrderHeader details whose grandTotal is greater than the average grandTotal for all orders date 2020-04-17.
+mysql> SELECT * FROM order_header WHERE 
+    -> grand_total > (SELECT AVG(grand_total) FROM order_header WHERE order_date = '2020-04-17');
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| ORDER_ID | ORDER_TYPE_ID | ORDER_NAME   | ORDER_DATE              | STATUS_ID       | CURRENCY_UOM_ID | PRODUCT_STORE_ID  | SALES_CHANNEL_ENUM_ID | GRAND_TOTAL |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+| 1051     | SALES_ORDER   | Test Order 1 | 2020-04-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     77.9500 |
+| 1061     | SALES_ORDER   | Test Order 6 | 2019-04-24 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     87.0700 |
+| 1102     | SALES_ORDER   | Test Order 3 | 2020-04-17 00:00:00.000 | ORDER_COMPLETED | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |    129.9200 |
+| 1255     | SALES_ORDER   | Test Order 5 | 2020-03-17 00:00:00.000 | ORDER_APPROVED  | USD             | OMS_DEFAULT_STORE | WEB_SALES_CHANNEL     |     75.9300 |
++----------+---------------+--------------+-------------------------+-----------------+-----------------+-------------------+-----------------------+-------------+
+4 rows in set (0.00 sec)
+---------------------------------------------------------------------------------
+21. List the RENTAL_ORDER_ITEM Order Item Details for each order.
+mysql> SELECT * FROM order_item WHERE
+    -> orderItemTypeId = 'rental_order_item';
++----------+-------------------+-------------------+------------+------------------+----------+-------------+-------------------+
+| ORDER_ID | ORDER_ITEM_SEQ_ID | SHIP_GROUP_SEQ_ID | PRODUCT_ID | ITEM_DESCRIPTION | QUANTITY | UNIT_AMOUNT | orderItemTypeId   |
++----------+-------------------+-------------------+------------+------------------+----------+-------------+-------------------+
+| 1051     | 03                | 02                | NULL       | Rental Item      | 3.000000 |     1.33000 | RENTAL_ORDER_ITEM |
+| 1052     | 02                | 01                | NULL       | Rental Item      | 1.000000 |     1.33000 | RENTAL_ORDER_ITEM |
+| 1102     | 03                | 01                | NULL       | Rental Item      | 3.000000 |     2.33000 | RENTAL_ORDER_ITEM |
+| 1153     | 02                | 01                | NULL       | Rental Item      | 1.000000 |     1.33000 | RENTAL_ORDER_ITEM |
+| 1153     | 04                | 01                | NULL       | Rental Item      | 1.000000 |     2.33000 | RENTAL_ORDER_ITEM |
+| 1255     | 02                | 01                | NULL       | Rental Item      | 3.000000 |     1.33000 | RENTAL_ORDER_ITEM |
++----------+-------------------+-------------------+------------+------------------+----------+-------------+-------------------+
+6 rows in set (0.00 sec)
+---------------------------------------------------------------------------------
+22. Find the Order details assigned to the facility with the “WebStoreWarehouse” value. Output the below fields for this query:
+orderId
+shipGroupSeqId
+facilityId
+customerPartyId
+productId
+itemDescription
+quantity
+mysql> SELECT oi.order_Id, oi.SHIP_GROUP_SEQ_ID, PRODUCT_ID,ITEM_DESCRIPTION, QUANTITY, FACILITY_ID, CUSTOMER_PARTY_ID FROM order_item oi INNER JOIN Order_Item_Ship_Group ot ON oi.order_Id = ot.order_Id WHERE FACILITY_ID = 'WebStoreWarehouse';
++----------+-------------------+-------------+-------------------------+----------+-------------------+-------------------+
+| order_Id | SHIP_GROUP_SEQ_ID | PRODUCT_ID  | ITEM_DESCRIPTION        | QUANTITY | FACILITY_ID       | CUSTOMER_PARTY_ID |
++----------+-------------------+-------------+-------------------------+----------+-------------------+-------------------+
+| 1051     | 01                | DEMO_UNIT_1 | Demo Product Unit One   | 1.000000 | WebStoreWarehouse | CustDemo1         |
+| 1051     | 02                | DEMO_UNIT_2 | Demo Product Unit Two   | 3.000000 | WebStoreWarehouse | CustDemo1         |
+| 1051     | 02                | NULL        | Rental Item             | 3.000000 | WebStoreWarehouse | CustDemo1         |
+| 1052     | 01                | DEMO_UNIT_3 | Demo Product Unit Three | 1.000000 | WebStoreWarehouse | CustDemo1         |
+| 1052     | 01                | NULL        | Rental Item             | 1.000000 | WebStoreWarehouse | CustDemo1         |
+| 1061     | 01                | DEMO_UNIT_2 | Demo Product Unit Two   | 2.000000 | WebStoreWarehouse | CustDemo6         |
+| 1061     | 02                | DEMO_UNIT_5 | Demo Product Unit Five  | 1.000000 | WebStoreWarehouse | CustDemo6         |
+| 1064     | 01                | DEMO_UNIT_5 | Demo Product Unit Five  | 3.000000 | WebStoreWarehouse | CustDemo6         |
+| 1064     | 02                | DEMO_UNIT_2 | Demo Product Unit Two   | 2.000000 | WebStoreWarehouse | CustDemo6         |
+| 1102     | 01                | DEMO_UNIT_1 | Demo Product Unit One   | 3.000000 | WebStoreWarehouse | CustDemo3         |
+| 1102     | 01                | DEMO_UNIT_2 | Demo Product Unit Two   | 3.000000 | WebStoreWarehouse | CustDemo3         |
+| 1102     | 01                | NULL        | Rental Item             | 3.000000 | WebStoreWarehouse | CustDemo3         |
+| 1102     | 02                | DEMO_UNIT_3 | Demo Product Unit Three | 1.000000 | WebStoreWarehouse | CustDemo3         |
+| 1153     | 01                | DEMO_UNIT_3 | Demo Product Unit Three | 1.000000 | WebStoreWarehouse | CustDemo4         |
+| 1153     | 01                | NULL        | Rental Item             | 1.000000 | WebStoreWarehouse | CustDemo4         |
+| 1153     | 01                | DEMO_UNIT_4 | Product Unit FourDemo   | 1.000000 | WebStoreWarehouse | CustDemo4         |
+| 1153     | 01                | NULL        | Rental Item             | 1.000000 | WebStoreWarehouse | CustDemo4         |
+| 1255     | 01                | DEMO_UNIT_4 | Demo Product Unit Four  | 3.000000 | WebStoreWarehouse | CustDemo5         |
+| 1255     | 01                | NULL        | Rental Item             | 3.000000 | WebStoreWarehouse | CustDemo5         |
+| 1255     | 02                | DEMO_UNIT_5 | Demo Product Unit Five  | 3.000000 | WebStoreWarehouse | CustDemo5         |
++----------+-------------------+-------------+-------------------------+----------+-------------------+-------------------+
+20 rows in set (0.00 sec)
+-----------------------------------------------------------------------------------
+23. List the below Order Information for the orderId, 1153.
+orderId
+shipGroupSeqId
+customerPartyId
+firstName
+lastName
+orderDate
+orderItemSeqId
+productId
+itemDescription
+unitAmount
+quantity
+grandTotal
+mysql> SELECT oinfo.order_Id, oinfo.ship_Group_Seq_Id, oinfo.customer_Party_Id, first_Name, last_Name, order_date, oi.order_Item_Seq_Id, product_Id, item_Description, unit_Amount, quantity, grand_Total FROM order_item oi INNER JOIN order_header oh ON oh.order_Id, order_item_ship_group oinfo INNER JOIN person ON person.party_Id = oinfo.customer_party_Id WHERE oi.order_Id = '1153';
++----------+-------------------+-------------------+------------+-----------+-------------------------+-------------------+-------------+-------------------------+-------------+----------+-------------+
+| order_Id | ship_Group_Seq_Id | customer_Party_Id | first_Name | last_Name | order_date              | order_Item_Seq_Id | product_Id  | item_Description        | unit_Amount | quantity | grand_Total |
++----------+-------------------+-------------------+------------+-----------+-------------------------+-------------------+-------------+-------------------------+-------------+----------+-------------+
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1051     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1051     | 02                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1052     | 01                | CustDemo1         | Joe        | Public    | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1102     | 01                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1102     | 02                | CustDemo3         | Lily       | Brown     | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1153     | 01                | CustDemo4         | John       | Norvig    | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1255     | 01                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1255     | 02                | CustDemo5         | Charlie    | William   | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1061     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1061     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1064     | 01                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     77.9500 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     77.9500 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     77.9500 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     77.9500 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     16.3200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     16.3200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     16.3200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     16.3200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     87.0700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     87.0700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     87.0700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2019-04-24 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     87.0700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     48.8700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     48.8700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     48.8700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2022-01-09 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     48.8700 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |    129.9200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |    129.9200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |    129.9200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |    129.9200 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     31.6400 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     31.6400 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     31.6400 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-04-19 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     31.6400 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 01                | DEMO_UNIT_3 | Demo Product Unit Three |    14.99000 | 1.000000 |     75.9300 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 02                | NULL        | Rental Item             |     1.33000 | 1.000000 |     75.9300 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 03                | DEMO_UNIT_4 | Product Unit FourDemo   |    12.99000 | 1.000000 |     75.9300 |
+| 1064     | 02                | CustDemo6         | James      | Evans     | 2020-03-17 00:00:00.000 | 04                | NULL        | Rental Item             |     2.33000 | 1.000000 |     75.9300 |
++----------+-------------------+-------------------+------------+-----------+-------------------------+-------------------+-------------+-------------------------+-------------+----------+-------------+
+336 rows in set (0.01 sec)
+
+24. List the below Order details for the customer partyId, CustDemo1.
+orderId
+shipGroupSeqId
+orderName
+customerPartyId
+orderItemSeqId
+productId
+itemDescription
+quantity
+unitAmount
+
+25. List facilityId and total where total = sum of (orderItem.quantity X orderItem.unitAmount).
+mysql> SELECT facility_Id, SUM(quantity * unit_Amount) FROM order_item oi Inner JOIN
+    -> Order_Item_Ship_Group osg ON osg.order_id = oi.order_id 
+    -> GROUP BY FACILITY_ID;
++--------------------+-----------------------------+
+| facility_Id        | SUM(quantity * unit_Amount) |
++--------------------+-----------------------------+
+| RegionalWarehouse1 |             213.89000000000 |
+| RegionalWarehouse2 |             205.85000000000 |
+| WebStoreWarehouse  |             467.70000000000 |
++--------------------+-----------------------------+
+3 rows in set (0.00 sec)
+
